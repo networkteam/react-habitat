@@ -28,6 +28,9 @@ function _callback(cb, context, ...args) {
  *  Bootstrapper class
  */
 export default class Bootstrapper {
+	componentSelector;
+	__container__;
+	rootReferences;
 
 	/**
 	 * Constructor
@@ -51,6 +54,12 @@ export default class Bootstrapper {
 		 * @private
 		 */
 		this.__container__ = null;
+
+		/**
+		 * The root references
+		 * @type {array}
+		 */
+		this.rootReferences = [];
 	}
 
 	/**
@@ -95,11 +104,13 @@ export default class Bootstrapper {
 						// Options
 						const options = registration.meta.options || {};
 
+						// cant we just save the reference to the root here????
 						// Inject the component
-						this.__container__.factory.inject(
+						const ref = this.__container__.factory.inject(
 							registration.component,
 							props,
 							Habitat.create(ele, this.__container__.id, options));
+						this.rootReferences.push(ref);
 					}).catch(err => {
 						Logger.error('RHW01', `Cannot resolve component "${componentName}" for element.`, err, ele);
 					}),
@@ -142,7 +153,7 @@ export default class Bootstrapper {
 
 		// Wire up the components from the container
 		this.update(null, () => {
-			_callback(cb, this);
+			() => _callback(cb, this);
 		});
 	}
 
@@ -217,7 +228,8 @@ export default class Bootstrapper {
 
 		// Clean up
 		for (let i = 0; i < habitats.length; ++i) {
-			this.__container__.factory.dispose(habitats[i]);
+			// TODO: we expect habitats and rootreferences to be in sync
+			this.__container__.factory.dispose(habitats[i], this.rootReferences[i]);
 			Habitat.destroy(habitats[i]);
 		}
 

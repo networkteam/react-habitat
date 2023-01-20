@@ -10,19 +10,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-class MockComponent extends React.Component {
-
-	innerText() {
-		if (this.props.title !== null) {
-			return `[component MockComponent](title='${this.props.title}')`;
+function MockComponent({ title }) {
+	const innterText = () => {
+		if (title !== null) {
+			return `[component MockComponent](title='${title}')`;
 		}
 
 		return '[component MockComponent]';
-	}
+	};
 
-	render() {
-		return <div>{this.innerText()}</div>;
-	}
+	return (<div>{innterText()}</div>);
 }
 
 MockComponent.propTypes = {
