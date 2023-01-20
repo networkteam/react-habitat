@@ -6,10 +6,18 @@
  * LICENSE file in the root directory of this source tree.
  */
 import React 		from 'react';
-import ReactDOM 	from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import Logger 		from '../Logger';
 
 export default class ReactDomFactory {
+
+	rootRender;
+	constructor() {
+		this.rootRender = null;
+
+		this.inject = this.inject.bind(this);
+		this.dispose = this.dispose.bind(this);
+	}
 
 	/**
 	* Injects a react component
@@ -19,10 +27,9 @@ export default class ReactDomFactory {
 	*/
 	static inject(module, props = {}, target) {
 		if (target) {
-			ReactDOM.render(
-				React.createElement(module, props || {}),
-				target,
-			);
+			const root = createRoot(target);
+			root.render(React.createElement(module, props || {}));
+			return root;
 		} else {
 			Logger.warn('RHW07', 'Target element is null or undefined.');
 		}
@@ -32,9 +39,9 @@ export default class ReactDomFactory {
 	 *  Disposes a react component
 	 * @param {HTMLElement}		target		- The target element to dispose
 	 */
-	static dispose(target) {
-		if (target) {
-			ReactDOM.unmountComponentAtNode(target);
+	static dispose(target, rootRef) {
+		if (target && rootRef) {
+			rootRef.unMount();
 		}
 	}
 
